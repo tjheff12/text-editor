@@ -11,13 +11,23 @@
       http-equiv="X-Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
     />
-    <link rel="stylesheet" href="./styles.css">
-    
-    <title>Text Editor</title>
+    <title>Hello from Electron renderer!</title>
   </head>
   <body>
+    <h1>Hello from Electron renderer!</h1>
+    <p>👋</p>
+    <p id="info"></p>
+    <br>
     
-      <textarea id="texteditor" class="textbox" wrap="soft" spellcheck="false">Petah, &#013;&#010; the horse is here.</textarea>
+    <div draggable="true" id="drag1">Drag me - File 1</div>
+    <div  draggable="true" id="drag2">Drag me - File 2</div>
+
+    <br>
+
+    <div>
+        <h3>Drag and Drop Files in the Window to display them below.</h3>
+        <p id="text"></p>
+    </div>
     
   </body>
   <script src="./renderer.js"></script>
