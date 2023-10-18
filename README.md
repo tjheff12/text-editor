@@ -11,6 +11,7 @@ TO RUN:
 After installing node.js for your computer run the commands:
 
 npm install_electron
+
 npm start
 
 THIS HAS ONLY BEEN TESTED FOR WINDOWS 11 MACHINES
