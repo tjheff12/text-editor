@@ -1,30 +1,17 @@
 const { contextBridge, ipcRenderer} = require('electron')
 
-contextBridge.exposeInMainWorld('versions', {
-  node: () => process.versions.node,
-  chrome: () => process.versions.chrome,
-  electron: () => process.versions.electron,
-  // we can also expose variables, not just functions
-  ping: () => ipcRenderer.invoke('ping'),
-  
-})
 
 
 contextBridge.exposeInMainWorld('electron', {
-    startDrag: (fileName) => {
-      ipcRenderer.send('ondragstart', fileName)
-    },
+    
     startDrop: (fileName) => {
         ipcRenderer.send('loadFile', fileName)
     },
-    loadFile: () => {
-        console.log("aaa");
-    }
   
   })
 
 
-ipcRenderer.on('reply', (_event, reply) => {
+ipcRenderer.on('displayFileContentsInTextbox', (_event, reply) => {
     
     const test = document.getElementById('texteditor')
     console.log("reply is: " + reply)

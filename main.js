@@ -1,3 +1,4 @@
+//dependancies
 const { app, BrowserWindow, ipcMain, Menu, webContents } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
@@ -6,6 +7,7 @@ const dialog = require('electron').dialog
 
 let currFile = 'None';
 
+//function for creating a new browser window
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
@@ -20,35 +22,44 @@ const createWindow = () => {
   win.loadFile('index.html');
   //win.loadURL('https://github.com')
   
-  //win.webContents.openDevTools();
+  
   return win
 }
 
-const testMenuTemplate = [{
-  label: 'File',
-  submenu: [
-    { role: 'quit' }
-  ]
-},]
-
-const testMenuTemplate2 = [
+const menuTemplate = [
   {
     label: 'File',
     submenu: [
       {
+        label:'New File',
+        accelerator: 'CmdOrCtrl+N',
+        // click event
+        click() {
+           // construct the select file dialog 
+           win.webContents.send('displayFileContentsInTextbox', 'Petah, the horse is here.')
+           currFile = 'None'
+        } 
+    },
+      {
          label:'Open File',
          accelerator: 'CmdOrCtrl+O',
-         // this is the main bit hijack the click event 
+         // click event
          click() {
             // construct the select file dialog 
             dialog.showOpenDialog({
-              properties: ['openFile']
+              properties: ['openFile'],
+              //defines accepted file types. This can open anything, but its helpful for the user to define a default
+              filters: [{ name: 'Text Files', extensions: ['txt'] },
+                { name: 'All Files', extensions: ['*'] },
+            
+              ],
             })
             .then(function(fileObj) {
-               // the fileObj has two props 
+               
                if (!fileObj.canceled) {
                  win.webContents.send('FILE_OPEN', fileObj.filePaths)
-                 currFile = fileObj.filePaths;
+                 currFile = fileObj.filePaths[0];
+                 console.log(currFile)
                }
             })
             .catch(function(err) {
@@ -60,32 +71,44 @@ const testMenuTemplate2 = [
       label:'Save File',
       accelerator: 'CmdOrCtrl+S',
       click() {
-        // construct the select file dialog 
+        
         if(currFile === 'None'){
-          dialog.showOpenDialog({
-            properties: ['openFile']
+          dialog.showSaveDialog({
+            
           })
           .then(function(fileObj) {
-             // the fileObj has two props 
-             if (!fileObj.canceled) {
-              
-               currFile = fileObj.filePaths;
+             
+            if (!fileObj.canceled) {
+              console.log(fileObj.filePath)
+              currFile = fileObj.filePath;
+              win.webContents.send('getContents')
+              ipcMain.once('contentReply', (event, contents) => {
+                console.log("savingFile")
+                console.log(currFile);
+                fs.writeFile(currFile, contents, err => {
+                  if (err) {
+                    console.error(err);
+                  }
+              });
+        })
              }
           })
           .catch(function(err) {
              console.error(err)  
           })
-        } 
-        win.webContents.send('getContents')
-        ipcMain.once('contentReply', (event, contents) => {
-          console.log("savingFile")
-          console.log(currFile);
-          fs.writeFile(currFile[0], contents, err => {
-            if (err) {
-              console.error(err);
-            }
+        } else {
+          win.webContents.send('getContents')
+          ipcMain.once('contentReply', (event, contents) => {
+            console.log("savingFile")
+            console.log(currFile);
+            fs.writeFile(currFile, contents, err => {
+              if (err) {
+                console.error(err);
+              }
           });
         })
+        }
+        
         
         
       }
@@ -109,7 +132,7 @@ const testMenuTemplate2 = [
         }
       },
       {
-        label:'Console Log Contents',
+        label:'Print Textbox to Console',
         click(){
           win.webContents.send('textValue')
         }
@@ -118,7 +141,8 @@ const testMenuTemplate2 = [
   }
 ]
 
-const menu = Menu.buildFromTemplate(testMenuTemplate2)
+//sets menu to be template above
+const menu = Menu.buildFromTemplate(menuTemplate)
 Menu.setApplicationMenu(menu)
 
 const iconName = path.join(__dirname, 'iconForDragAndDrop.png')
@@ -143,14 +167,13 @@ app.whenReady().then(() => {
     ipcMain.on('loadFile', (event, filePath) => {
         if (filePath != undefined) {
             console.log(filePath)
-            body =  fs.readFileSync(filePath, 'utf8')
-            const bodyString = String(body)
+            fileContents =  fs.readFileSync(filePath, 'utf8')
             
-            //console.log(String(body).replace('\n','&#13;&#10;'))
-            let test = String(body);
-            let test2 = test.replace(/(?:\r\n|\r|\n)/g, '&#013;&#010;')
-            console.log(test2)
-            event.reply('reply', test)
+            let reply = String(fileContents);
+            //Leftover relic for replacing newline with ascii. This was fixed in renderer by changing innerHTML instead of innerText
+            //let test2 = test.replace(/(?:\r\n|\r|\n)/g, '&#013;&#010;')
+            console.log(reply)
+            event.reply('displayFileContentsInTextbox', reply)
         }
     })
     
@@ -164,12 +187,6 @@ app.on('window-all-closed', () => {
     }
   })
 
-ipcMain.on('ondragstart', (event, filePath) => {
-    event.sender.startDrag({
-      file: path.join(__dirname, filePath),
-      icon: iconName
-    })
-  })
 
 ipcMain.on('logText', (event, text) => {
   console.log(text)

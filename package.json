@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "electron ./testMain.js",
+    "install_electron": "npm install --save-dev electron"
   },
   "author": "",
   "license": "ISC",
