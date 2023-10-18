@@ -45,16 +45,11 @@ ipcRenderer.on('textValue', (event, args) => {
   console.log('getting textarea value')
   elem = document.getElementById('texteditor');
   text = elem.value;
-  ipcRenderer.send('mainTextValue', text)
+  ipcRenderer.send('logText', text)
 })
 
 
-ipcRenderer.on('textValue', (event, args) => {
-  
-  elem = document.getElementById('texteditor');
-  text = elem.value;
-  event.reply('')
-})
+
 
 ipcRenderer.on('getContents', (event, args) => {
   elem = document.getElementById('texteditor');

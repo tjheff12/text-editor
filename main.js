@@ -20,7 +20,7 @@ const createWindow = () => {
   win.loadFile('index.html');
   //win.loadURL('https://github.com')
   
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
   return win
 }
 
@@ -90,12 +90,7 @@ const testMenuTemplate2 = [
         
       }
      },
-     {
-        label:'Console Log Contents',
-        click(){
-          win.webContents.send('textValue')
-        }
-     },
+     
      {
          label:'Exit',
          click() {
@@ -103,6 +98,23 @@ const testMenuTemplate2 = [
          } 
        }
     ]
+  },
+  {
+    label:'Debug',
+    submenu: [
+      {
+        label:'Open Dev Tools',
+        click(){
+          win.webContents.openDevTools();
+        }
+      },
+      {
+        label:'Console Log Contents',
+        click(){
+          win.webContents.send('textValue')
+        }
+      },
+  ]
   }
 ]
 
@@ -159,6 +171,6 @@ ipcMain.on('ondragstart', (event, filePath) => {
     })
   })
 
-ipcMain.on('mainTextValue', (event, text) => {
+ipcMain.on('logText', (event, text) => {
   console.log(text)
 })
