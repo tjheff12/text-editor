@@ -154,14 +154,43 @@ const menuTemplate = [
     ]
   },
   {
+    label: 'View',
+    submenu: [
+      //{ role: 'reload' },
+      //{ role: 'forceReload' },
+      { role: 'toggleDevTools' },
+      { type: 'separator' },
+      { role: 'resetZoom' },
+      { role: 'zoomIn' },
+      { role: 'zoomOut' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
+    ]
+  },
+  // { role: 'windowMenu' }
+  {
+    label: 'Window',
+    submenu: [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      ...(isMac
+        ? [
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' }
+          ]
+        : [
+            { role: 'close' }
+          ])
+    ]
+  },
+  {
     label:'Debug',
     submenu: [
-      {
-        label:'Open Dev Tools',
-        click(){
-          win.webContents.openDevTools();
-        }
-      },
+      
+      { role: 'toggleDevTools' },
+      
       {
         label:'Print Textbox to Console',
         click(){
