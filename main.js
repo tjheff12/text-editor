@@ -5,6 +5,7 @@ const fs = require('fs')
 const https = require('https')
 const dialog = require('electron').dialog
 
+const isMac = process.platform === 'darwin'
 let currFile = 'None';
 
 //function for creating a new browser window
@@ -113,13 +114,43 @@ const menuTemplate = [
         
       }
      },
-     
+     { type: 'separator' },
      {
          label:'Exit',
          click() {
             app.quit()
          } 
        }
+    ]
+  },
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      ...(isMac
+        ? [
+            { role: 'pasteAndMatchStyle' },
+            { role: 'delete' },
+            { role: 'selectAll' },
+            { type: 'separator' },
+            {
+              label: 'Speech',
+              submenu: [
+                { role: 'startSpeaking' },
+                { role: 'stopSpeaking' }
+              ]
+            }
+          ]
+        : [
+            { role: 'delete' },
+            { type: 'separator' },
+            { role: 'selectAll' }
+          ])
     ]
   },
   {
